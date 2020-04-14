@@ -220,6 +220,9 @@ public:
 	virtual std::string genomeToStr() override;
 
 	virtual void printGenome() override;
+    
+	std::shared_ptr<AbstractGenome> makeOneBitMutant(int idx);
+
 
 };
 

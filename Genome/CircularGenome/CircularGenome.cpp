@@ -1036,3 +1036,11 @@ void CircularGenome<T>::printGenome() {
 	std::cout << std::endl;
 }
 
+template<class T>
+std::shared_ptr<AbstractGenome> CircularGenome<T>::makeOneBitMutant(int idx){
+	auto newGenome = std::make_shared<CircularGenome<T>>(PT);
+	newGenome->copyFrom(this);
+    newGenome->sites[idx] = !newGenome->sites[idx];
+	newGenome->recordDataMap();
+	return newGenome;
+}
