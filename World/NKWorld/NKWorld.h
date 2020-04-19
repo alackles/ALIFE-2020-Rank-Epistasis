@@ -10,7 +10,6 @@
 #pragma once
 
 #include "../AbstractWorld.h"
-#include "../../Genome/CircularGenome/CircularGenome.h"
 
 #include <cstdlib>
 #include <thread>
@@ -22,6 +21,7 @@
 
 struct NKOrgData{
     size_t rank;
+    size_t idx_original;
     double score_original;
     double score_mutant;
 };
@@ -77,6 +77,7 @@ public:
     void recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups);
 
     // evaluate functions
+    double evaluateBrain(std::shared_ptr<AbstractBrain>& brain);
     void evaluateSolo(std::shared_ptr<Organism> org, int analyze, int visualize, int debug);
    
     virtual void evaluate(std::map<std::string, std::shared_ptr<Group>> &groups,
