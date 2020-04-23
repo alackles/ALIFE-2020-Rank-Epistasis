@@ -486,6 +486,7 @@ void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> 
         std::cout << "Recording mutant fitness..." << std::endl;
         output_string_stream.str("");
         int pop_size = groups[groupNamePL->get(PT)]->population.size();
+        double score_original = 0;
         double score_running_avg_0 = 0;
         double score_max_0 = 0;
         double score_min_0 = 1000000;
@@ -497,10 +498,22 @@ void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> 
         double score_max_2 = 0;
         double score_min_2 = 1000000;
         for (int i = 0; i < pop_size; i++) {
+            score_original = 0;
+            score_running_avg_0 = 0;
+            score_max_0 = 0;
+            score_min_0 = 1000000;
+            score = 0;
+            score_running_avg_1 = 0;
+            score_max_1 = 0;
+            score_min_1 = 1000000;
+            score_running_avg_2 = 0;
+            score_max_2 = 0;
+            score_min_2 = 1000000;
             // Get organism, evaluate it, cache score
             auto org_copy = groups[groupNamePL->get(PT)]->population[i]->makeCopy(); 
             evaluateSolo(org_copy, 0, 0, 0); 
             score = org_copy->dataMap.getAverage("score");
+            score_original = score;
             score_running_avg_0 += (score / pop_size);
             if(i == 0){
                 score_max_0 = score;
@@ -544,7 +557,7 @@ void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> 
                         ->makeBrain(org_copy->genomes);
                 evaluateSolo(org_copy, 0, 0, 0); 
                 score = org_copy->dataMap.getAverage("score");
-                score_running_avg_1 += (score / (pop_size * N));
+                score_running_avg_1 += (score / N);
                 if(i == 0 && j == 0){
                     score_max_1 = score;
                     score_min_1 = score;
@@ -583,7 +596,7 @@ void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> 
                             ->makeBrain(org_copy->genomes);
                     evaluateSolo(org_copy, 0, 0, 0); 
                     score = org_copy->dataMap.getAverage("score");
-                    score_running_avg_2 += (score / (pop_size * N * (N - 1) / 2));
+                    score_running_avg_2 += (score / (N * (N - 1) / 2));
                     if(i == 0 && j == 0){
                         score_max_2 = score;
                         score_min_2 = score;
@@ -596,108 +609,33 @@ void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> 
                     }
                 }
             }
+            output_string_stream 
+                << Global::update << ","
+                << i << ","
+                << "0" << "," 
+                << score_original << "," 
+                << score_original << "," 
+                << score_original
+                << std::endl;
+            output_string_stream 
+                << Global::update << ","
+                << i << ","
+                << "1" << "," 
+                << score_running_avg_1 << "," 
+                << score_max_1 << "," 
+                << score_min_1
+                << std::endl;
+            output_string_stream 
+                << Global::update << ","
+                << i << ","
+                << "2" << "," 
+                << score_running_avg_2 << "," 
+                << score_max_2 << "," 
+                << score_min_2 
+                << std::endl;
         }
-        output_string_stream 
-            << Global::update << ","
-            << "0" << "," 
-            << score_running_avg_0 << "," 
-            << score_max_0 << "," 
-            << score_min_0
-            << std::endl;
-        output_string_stream 
-            << Global::update << ","
-            << "1" << "," 
-            << score_running_avg_1 << "," 
-            << score_max_1 << "," 
-            << score_min_1
-            << std::endl;
-        output_string_stream 
-            << Global::update << ","
-            << "2" << "," 
-            << score_running_avg_2 << "," 
-            << score_max_2 << "," 
-            << score_min_2;
-        //// Sort orgs based on original fitness. Assign ranks 0 through N-1
-        //std::stable_sort(mutant_data_vec.begin(), mutant_data_vec.end(), 
-        //    [](const NKOrgData& a, const NKOrgData& b){
-        //   return a.score_original < b.score_original; 
-        //});
-        //for (int i = 0; i < popSize; i++) {
-        //    mutant_data_vec[i].rank = i;
-        //}
-        //for(size_t bit_idx = 0; bit_idx < N; ++bit_idx){
-        //    // Return to original order for stable sorting
-        //    std::stable_sort(mutant_data_vec.begin(), mutant_data_vec.end(), 
-        //        [](const NKOrgData& a, const NKOrgData& b){
-        //       return a.idx_original < b.idx_original; 
-        //    });
-        //    for (int i = 0; i < popSize; i++) {
-        //        // Get organism, evaluate it, cache score
-        //        auto org_copy = groups[groupNamePL->get(PT)]->population[i]->makeCopy(); 
-        //        // Mutate organism
-        //        std::shared_ptr<AbstractGenome> g = org_copy->genomes["root::"];
-        //        std::shared_ptr<CircularGenome<bool>::Handler> genome_original = 
-        //            std::dynamic_pointer_cast<CircularGenome<bool>::Handler>(
-        //                g->newHandler(g));
-        //        CircularGenome<bool> tmp_mutant_genome(2, 200, PT);
-        //        std::shared_ptr<AbstractGenome> tmp_mutant_genome_ptr = 
-        //            std::make_shared<CircularGenome<bool>>(tmp_mutant_genome);
-        //        std::shared_ptr<CircularGenome<bool>::Handler> genome_mutant = 
-        //            std::dynamic_pointer_cast<CircularGenome<bool>::Handler>(
-        //                tmp_mutant_genome_ptr->newHandler(tmp_mutant_genome_ptr));
-        //        genome_mutant->resetHandler();
-        //        int read_val = 0;
-        //        for(size_t site_idx=0; site_idx < genome_original->genome->countSites();++site_idx){
-        //            read_val = genome_original->readInt(0,1);
-        //            if(site_idx == bit_idx){
-        //               genome_mutant->writeInt((read_val + 1) & 1, 0, 1);
-        //            }
-        //            else{
-        //               genome_mutant->writeInt(read_val, 0, 1);
-        //            }
-        //        }
-        //    
-        //        //// Reevaluate organism after mutation
-        //        org_copy->dataMap.clear("score");
-        //        org_copy->genomes["root::"] = genome_mutant->genome;
-        //        org_copy->brains["root::"] = 
-        //            std::dynamic_pointer_cast<ConstantValuesBrain>(org_copy->brains["root::"])
-        //                ->makeBrain(org_copy->genomes);
-        //        evaluateSolo(org_copy, 0, 0, 0); 
-        //        mutant_data_vec[i].score_mutant = org_copy->dataMap.getAverage("score");
-        //    }
-        //    // Mistakes have been made
-        //    std::stable_sort(mutant_data_vec.begin(), mutant_data_vec.end(), 
-        //        [](const NKOrgData& a, const NKOrgData& b){
-        //       return a.rank < b.rank; 
-        //    });
-        //    // Sort to new, mutated order
-        //    std::stable_sort(mutant_data_vec.begin(), mutant_data_vec.end(), 
-        //        [](const NKOrgData& a, const NKOrgData& b){
-        //       return a.score_mutant < b.score_mutant; 
-        //    });
-        //    for (int i = 0; i < popSize; i++) {
-        //        rank_vec_mutated[i] = mutant_data_vec[i].rank;
-        //       }
-        //    //std::cout << "mutants (" << Global::update << "," << bit_idx << ") " << std::endl; 
-        //    //for (int i = 0; i < popSize; i++) {
-        //    //    std::cout << "[" << rank_vec_mutated[i] << "]"
-        //    //        << mutant_data_vec[i].score_mutant << " ";
-        //    //}
-        //    //std::cout << std::endl;
-        //    double edit_distance = EditDistance(rank_vec_original, rank_vec_mutated, 
-        //                                (EditDistanceMetric)edit_distance_metric);
-        //    //std::cout << "edit distance (" << Global::update << "," << bit_idx << ") " 
-        //    //    << edit_distance << std::endl;
-        //    output_string_stream << Global::update 
-        //                         << ","
-        //                         << bit_idx
-        //                         << ","
-        //                         << edit_distance
-        //                         << std::endl;
-        //    }
         FileManager::writeToFile(output_mutant_fitness_filename, output_string_stream.str(), 
-            "update,num_mutations,fitness_avg,fitness_max,fitness_min");
+            "update,org_idx,num_mutations,fitness_avg,fitness_max,fitness_min");
     }
     
 //void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups){
