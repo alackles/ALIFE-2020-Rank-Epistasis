@@ -213,17 +213,17 @@ std::shared_ptr<ParameterLink<std::string>> NKWorld::groupNamePL =
 Parameters::register_parameter("WORLD_NK_NAMES-groupNameSpace",
         (std::string) "root::",
         "namespace of group to be evaluated");
-std::shared_ptr<ParameterLink<bool>> NKWorld::outputMutantFitnessPL =
-Parameters::register_parameter("WORLD_NK_OUTPUT-outputMutantFitness", false,
-        "If true, output the fitness of one-bit mutants");
-std::shared_ptr<ParameterLink<std::string>> NKWorld::outputMutantFitnessFilenamePL =
-Parameters::register_parameter("WORLD_NK_OUTPUT-outputMutantFitnessFilename", 
+std::shared_ptr<ParameterLink<bool>> NKWorld::outputRankEpistasisPL =
+Parameters::register_parameter("WORLD_NK_OUTPUT-outputRankEpistasis", false,
+        "If true, output the rank epistasis values to file");
+std::shared_ptr<ParameterLink<std::string>> NKWorld::outputRankEpistasisFilenamePL =
+Parameters::register_parameter("WORLD_NK_OUTPUT-outputRankEpistasisFilename", 
         (std::string)"mutant_data.csv",
-        "If we output mutant fitness, where to save it?");
-std::shared_ptr<ParameterLink<int>> NKWorld::outputMutantFitnessIntervalPL =
-Parameters::register_parameter("WORLD_NK_OUTPUT-outputMutantFitnessInterval", 
+        "If we output rank epistasis, where to save it?");
+std::shared_ptr<ParameterLink<int>> NKWorld::outputRankEpistasisIntervalPL =
+Parameters::register_parameter("WORLD_NK_OUTPUT-outputRankEpistasisInterval", 
         100,
-        "If we output mutant fitness, how often do we do so?");
+        "If we output rank epistasis, how often do we do so?");
 std::shared_ptr<ParameterLink<int>> NKWorld::outputEditDistanceMetricPL =
 Parameters::register_parameter("WORLD_NK_OUTPUT-outputEditDistanceMetric", 
         0,
@@ -241,9 +241,9 @@ NKWorld::NKWorld(std::shared_ptr<ParametersTable> PT_)
     N = nPL->get(PT);
     K = kPL->get(PT);
 
-    output_mutant_fitness = outputMutantFitnessPL->get(PT);
-    output_mutant_fitness_filename = outputMutantFitnessFilenamePL->get(PT);
-    output_mutant_fitness_interval = outputMutantFitnessIntervalPL->get(PT);
+    output_rank_epistasis =          outputRankEpistasisPL->get(PT);
+    output_rank_epistasis_filename = outputRankEpistasisFilenamePL->get(PT);
+    output_rank_epistasis_interval = outputRankEpistasisIntervalPL->get(PT);
     edit_distance_metric = outputEditDistanceMetricPL->get(PT);
     
     // generate NK lookup table
@@ -368,7 +368,7 @@ void NKWorld::evaluateSolo(std::shared_ptr<Organism> org, int analyze,
     }
 }
 
-void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups){
+void NKWorld::recordRankEpistasis(std::map<std::string, std::shared_ptr<Group>> &groups){
         std::cout << "Recording edit distance..." << std::endl;
         output_string_stream.str("");
         int popSize = groups[groupNamePL->get(PT)]->population.size();
@@ -462,6 +462,11 @@ void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> 
                                  << edit_distance
                                  << std::endl;
         }
-        FileManager::writeToFile(output_mutant_fitness_filename, output_string_stream.str(), 
+        FileManager::writeToFile(output_rank_epistasis_filename, output_string_stream.str(), 
             "update,bit_idx,edit_distance");
-    } 
+    }
+
+//void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups){
+
+
+ 

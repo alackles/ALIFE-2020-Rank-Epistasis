@@ -44,9 +44,9 @@ public:
     static std::shared_ptr<ParameterLink<bool>> treadmillPL;
     static std::shared_ptr<ParameterLink<double>> velocityPL; 
 
-    static std::shared_ptr<ParameterLink<bool>> outputMutantFitnessPL; 
-    static std::shared_ptr<ParameterLink<std::string>> outputMutantFitnessFilenamePL; 
-    static std::shared_ptr<ParameterLink<int>> outputMutantFitnessIntervalPL; 
+    static std::shared_ptr<ParameterLink<bool>> outputRankEpistasisPL; 
+    static std::shared_ptr<ParameterLink<std::string>> outputRankEpistasisFilenamePL; 
+    static std::shared_ptr<ParameterLink<int>> outputRankEpistasisIntervalPL; 
     static std::shared_ptr<ParameterLink<int>> outputEditDistanceMetricPL; 
     
     static std::shared_ptr<ParameterLink<std::string>> groupNamePL;
@@ -56,10 +56,10 @@ public:
     int N;
     int K;
 
-    // Mutant fitness output variables
-    bool output_mutant_fitness;
-    std::string output_mutant_fitness_filename;    
-    int output_mutant_fitness_interval;
+    // Rank Epistasis output variables
+    bool output_rank_epistasis;
+    std::string output_rank_epistasis_filename;    
+    int output_rank_epistasis_interval;
     int edit_distance_metric;
     std::stringstream output_string_stream;
     std::vector<size_t> rank_vec_original;  
@@ -74,7 +74,8 @@ public:
     // NK-specific functions
     double triangleSin(double x);
 
-    void recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups);
+    void recordRankEpistasis(std::map<std::string, std::shared_ptr<Group>> &groups);
+    //void recordMutationalStepFitness(std::map<std::string, std::shared_ptr<Group>> &groups);
 
     // evaluate functions
     double evaluateBrain(std::shared_ptr<AbstractBrain>& brain);
@@ -87,8 +88,8 @@ public:
             evaluateSolo(groups[groupNamePL->get(PT)]->population[i], analyze,
                                      visualize, debug);
         }
-        if(output_mutant_fitness && Global::update % output_mutant_fitness_interval == 0)
-            recordMutantFitness(groups);
+        if(output_rank_epistasis && Global::update % output_rank_epistasis_interval == 0)
+            recordRankEpistasis(groups);
     }
 
     virtual std::unordered_map<std::string, std::unordered_set<std::string>>
