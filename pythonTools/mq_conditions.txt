@@ -5,7 +5,7 @@
 # REPS = [FIRST REP] [LAST REP]
 # if experiments are up to 3-digits, then start at 101. If up to 4-digits start at 1001, etc.
 # This convention solves sorting and zero-padding problems later.
-REPS = 101 103
+REPS = 101 150
 
 # Settings to override the config files, but will not be varied
 # Multiple CONSTANT definitions will be added together.
@@ -13,23 +13,40 @@ REPS = 101 103
 
 # VAR = [SHORT NAME]	[REAL NAME]	[conditon1,condition2,etc.]
 # Short name is used in this file, and also determines output directory names
-VAR = EAM	WORLD_BERRY-allowEatAndMove
-VAR = AE	WORLD_BERRY-alwaysEat
+#VAR = EAM	WORLD_BERRY-allowEatAndMove
+#VAR = AE	WORLD_BERRY-alwaysEat
+VAR = FIX WORLD_NK-readNKTable 
+VAR = K WORLD_NK-k 
+VAR = ED WORLD_NK_OUTPUT-outputEditDistanceMetric 
+VAR = MUT GENOME_CIRCULAR-mutationIndelRate
+
+# Release vars from memory
+rm(example_filename)
+
+# Prepare the data frame to hold the scraped data
+data = data.frame(data = matrix(nrow = 0, ncol = length(column_names)))
+colnames(data) = column_names
+print('Column names to scrape: ')
+print(colnames(data))
+
 
 # Alternatively to VAR/EXCEPT, conditions can achieve a similar effect and still respect EXCEPT declarations
 #CONDITIONS = TSK=1.0,3.0  RF1="some message here"  RF2=2,[1,2,3,4]
-CONDITIONS = EAM=1,0  AE=0
+#CONDITIONS = EAM=1,0  AE=0
+CONDITIONS = FIX=0,1 K=3,5,10 ED=0,1 MUT=0.1,0.01
 
 # EXCEPT = [SHORT NAME]=[condition],[SHORT NAME]=[condition],etc.
 # If all name/condition pairs are met for any EXCEPT, then that combination will not be run.
 #EXCEPT = EAM=0 AE=0
+EXCEPT = FIX=1 K=5
+EXCEPT = FIX=1 K=10
 
 # list of setting files (.cfg) which you want MABE to load with the -f option. files will be loaded in the order provided.
 SETTINGS = settings.cfg,settings_organism.cfg,settings_world.cfg
 
 # list of files used by MABE (i.e. maps, images, etc.) and you can use rep replacement {{rep}} syntax
 # these files will be copied to the working directory if necessary
-#OTHERFILES = my_file.txt
+OTHERFILES = fit_flat_3.dat
 
 # a population_loader.plf file can be created using the contents here
 # be sure to set the -p GLOBAL-initPop population_loader.plf in CONSTANT definitions above
@@ -56,4 +73,3 @@ HPCC_PARAMETERS = #SBATCH --ntasks=1
 HPCC_PARAMETERS = #SBATCH --cpus-per-task=1
 HPCC_PARAMETERS = #SBATCH --time=03:50:00
 HPCC_PARAMETERS = #SBATCH --mem=2G
-HPCC_PARAMETERS = #SBATCH --mail-type=FAIL
