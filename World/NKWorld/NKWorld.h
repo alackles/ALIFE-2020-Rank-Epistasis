@@ -49,6 +49,10 @@ public:
     static std::shared_ptr<ParameterLink<int>> outputRankEpistasisIntervalPL; 
     static std::shared_ptr<ParameterLink<int>> outputEditDistanceMetricPL; 
     
+    static std::shared_ptr<ParameterLink<bool>> outputMutantFitnessPL; 
+    static std::shared_ptr<ParameterLink<std::string>> outputMutantFitnessFilenamePL; 
+    static std::shared_ptr<ParameterLink<int>> outputMutantFitnessIntervalPL; 
+    
     static std::shared_ptr<ParameterLink<std::string>> groupNamePL;
     static std::shared_ptr<ParameterLink<std::string>> brainNamePL;
 
@@ -65,6 +69,10 @@ public:
     std::vector<size_t> rank_vec_original;  
     std::vector<size_t> rank_vec_mutated;  
     std::vector<NKOrgData> mutant_data_vec;  
+    // Mutant fitness variables
+    bool output_mutant_fitness;
+    std::string output_mutant_fitness_filename;    
+    int output_mutant_fitness_interval;
 
     std::vector<std::vector<std::pair<double,double>>> NKTable;
 
@@ -75,7 +83,7 @@ public:
     double triangleSin(double x);
 
     void recordRankEpistasis(std::map<std::string, std::shared_ptr<Group>> &groups);
-    //void recordMutationalStepFitness(std::map<std::string, std::shared_ptr<Group>> &groups);
+    void recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups);
 
     // evaluate functions
     double evaluateBrain(std::shared_ptr<AbstractBrain>& brain);
@@ -90,6 +98,8 @@ public:
         }
         if(output_rank_epistasis && Global::update % output_rank_epistasis_interval == 0)
             recordRankEpistasis(groups);
+        if(output_mutant_fitness && Global::update % output_mutant_fitness_interval == 0)
+            recordMutantFitness(groups);
     }
 
     virtual std::unordered_map<std::string, std::unordered_set<std::string>>
