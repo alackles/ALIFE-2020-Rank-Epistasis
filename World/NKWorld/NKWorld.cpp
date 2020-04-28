@@ -20,6 +20,7 @@
 #include "../../Brain/ConstantValuesBrain/ConstantValuesBrain.h"
 #include <vector>
 #include <map>
+#include <set>
 #include <iostream>
 #include <fstream>
 
@@ -391,6 +392,7 @@ void NKWorld::recordRankEpistasis(std::map<std::string, std::shared_ptr<Group>> 
         rank_vec_original.resize(popSize);  
         rank_vec_mutated.resize(popSize);
         std::iota(rank_vec_original.begin(), rank_vec_original.end(), 0);
+        std::set<std::string> unique_genome_strings;
         mutant_data_vec.resize(popSize);
         for (int i = 0; i < popSize; i++) {
             // Get organism, evaluate it, cache score
@@ -398,7 +400,9 @@ void NKWorld::recordRankEpistasis(std::map<std::string, std::shared_ptr<Group>> 
             evaluateSolo(org_copy, 0, 0, 0); 
             mutant_data_vec[i].score_original = org_copy->dataMap.getAverage("score");
             mutant_data_vec[i].idx_original = i;
+            unique_genome_strings.insert(org_copy->genomes["root::"]->genomeToStr());
         }
+        const size_t unique_genome_count = unique_genome_strings.size();
         // Sort orgs based on original fitness. Assign ranks 0 through N-1
         std::stable_sort(mutant_data_vec.begin(), mutant_data_vec.end(), 
             [](const NKOrgData& a, const NKOrgData& b){
@@ -476,10 +480,12 @@ void NKWorld::recordRankEpistasis(std::map<std::string, std::shared_ptr<Group>> 
                                  << bit_idx
                                  << ","
                                  << edit_distance
+                                 << ","
+                                 << unique_genome_count
                                  << std::endl;
         }
         FileManager::writeToFile(output_rank_epistasis_filename, output_string_stream.str(), 
-            "update,bit_idx,edit_distance");
+            "update,bit_idx,edit_distance,unique_genomes");
     }
 
 void NKWorld::recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups){
