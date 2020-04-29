@@ -1,6 +1,6 @@
 # Rank epistasis:  A new model for analyzing epistaticinteractions in the absence of quantifiable fitness scores
 
-This repository holds all data from our class project for CSe 845 during MSU's spring 2020 semester. 
+This repository holds all data from our class project for CSE 845 during MSU's spring 2020 semester. 
 
 Authors:
 - Acacia Ackles
@@ -44,7 +44,7 @@ To run the program, we simply run MABE:
 ```
 ./mabe
 ```
-However, we almost always want to run MABE with settings file, so we do that as follows (example settings files included in repo):
+However, we almost always want to run MABE with settings files, so we do that as follows (example settings files included in repo):
 ```
 ./mabe -f settings*
 ```
@@ -53,7 +53,8 @@ That's pretty much it!
 If you desire to run a large batch of experiments (as we did in the paper), it's easiest to use mq. 
 Additional information on mq is given by the help file: 
 ```python pythonTools/mq.py -h```
-mq uses a condition file to specify the runs that will be conducted. Our condition files are included here. 
+Standard mq uses a condition file to specify the runs that will be conducted. 
+Our condition file is included [here](./pythonTools/mq_conditions.txt), and you can see most of the treatments from the paper as commented-out condition lines. 
 To run mq with a condition file we run:
 ```
 python pythonTools/mq.py -f {FILENAME}
