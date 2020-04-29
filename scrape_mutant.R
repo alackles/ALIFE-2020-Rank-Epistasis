@@ -6,12 +6,11 @@ library(dplyr)
 library(hash)
 
 # Config vars
-#file_of_filenames = 'dirs_to_scrape.txt'
-file_of_filenames = 'file_lists/files_TRD_1_final.txt'
+file_of_filenames = 'file_lists/files_TRD_0_final.txt'
 filename_list_prefix = strsplit(file_of_filenames, '.txt')[[1]][1]
 filename_seed_prefix = '/'
-filename_seed_suffix = '/edit_distance.csv'
-filename_out_prefix = 'data/edit_distance_TRD_1_final__'
+filename_seed_suffix = '/mutant_fitness.csv'
+filename_out_prefix = 'data/parts/mutant_fitness_TRD_0_final__'
 min_seed = 501
 max_seed = 550
 
@@ -19,19 +18,24 @@ max_seed = 550
 filename_vec = as.character(read.csv(file_of_filenames, header = F)[,1])
 cat(paste0('Found ', length(filename_vec), ' files to scrape!\n'))
 
-# Prepare the column names for the data frame
+# Grab the appropriate column names
 column_names = c(
-    'update','bit_idx','edit_distance', 'unique_genomes', 'condition', 'seed',
-    'FIX','K','ED', 'MUT', 'TRD', 'VEL')
+    'update',
+    'org_idx', 
+    'num_mutations',
+    'fitness_avg',
+    'fitness_max',
+    'fitness_min',
+    'condition', 'seed','FIX', 'K', 'ED', 'MUT', 'TRD', 'VEL')
 print('Column names to scrape: ')
-print(colnames(data))
+print(column_names)
 
 condition_num = 1
 # Actually start scraping data
 for(filename in filename_vec){
+    cat(paste0(condition_num, ' / ', length(filename_vec), ': ', filename, '\n'))
     data = data.frame(data = matrix(nrow = 0, ncol = length(column_names)))
     colnames(data) = column_names
-    cat(paste0(condition_num, ' / ', length(filename_vec), ': ', filename, '\n'))
     cur_vals = hash()
     cur_vals[['condition']] = strsplit(filename, '__')[[1]][1]
     param_pairs = strsplit(filename, '__')[[1]]
@@ -45,7 +49,7 @@ for(filename in filename_vec){
         cur_vals[['TRD']] = 0
         cur_vals[['VEL']] = 0
     }
-    for(seed in min_seed:max_seed){
+    for(seed in (min_seed + 1):max_seed){
         filename_seed = paste0(
                 filename,
                 filename_seed_prefix,
@@ -57,7 +61,7 @@ for(filename in filename_vec){
             next
         }
         data_seed = cbind(
-            read.csv(filename_seed),
+            read.csv(filename_seed), 
             cur_vals[['condition']],
             seed, 
             cur_vals[['FIX']],
@@ -74,4 +78,4 @@ for(filename in filename_vec){
     write.csv(data, file = paste0(filename_out_prefix, condition_num, '.csv'))
     condition_num = condition_num + 1
 }
-cat(paste0('Done! Saved results to files: ', filename_out_prefix, 'n.csv\n'))
+cat(paste0('Done! Saved results to: ', filename_out_prefix, 'n.csv\n'))

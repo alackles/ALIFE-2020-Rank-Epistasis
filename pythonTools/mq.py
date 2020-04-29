@@ -167,6 +167,8 @@ parser.add_argument('-f', '--file', type=str, metavar='FILE_NAME', default='mq_c
                     help='file which defines conditions - default: mq_conditions.txt', required=False)
 parser.add_argument('-i', '--indefinite', action='store_true', default=False,
                     help='run jobs until they self-terminate (longjob) - default : false', required=False)
+parser.add_argument('-o', '--offset', action='store', default=0, type=int,
+                    help='Amount to offset the condition numbers (C# + o) - default : 0', required=False)
 args = parser.parse_args()
 
 variables = {}
@@ -452,16 +454,16 @@ elif using_conditions: # This section is for parsing the CONDITIONS lines
                 conditions.append(''.join([e[1] for e in each_combination])) # store full condition path string for folder name generation
                 combinations.append(' '+' '.join([e[0] for e in each_combination])) # store MABE-like full parameter string
 
-padSizeCombinations = len(str(len(combinations)))
+padSizeCombinations = len(str(len(combinations) + args.offset))
 i = 0 
 
 print("")
 print("including:")
 for c in conditions:
     if (displayName == ""):
-        conditionDirectoryName = "C" + str(i).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(c[1:-1])
+        conditionDirectoryName = "C" + str(i + args.offset).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(c[1:-1])
     else:
-        conditionDirectoryName = displayName + "_C" + str(i).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(c[1:-1])
+        conditionDirectoryName = displayName + "_C" + str(i + args.offset).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(c[1:-1])
     print("  " + conditionDirectoryName)
     i = i+1
 print("")
@@ -517,9 +519,9 @@ for i in range(len(combinations)):
             # turn cgf_files list into a space separated string
             cfg_files_str = ' '.join(cfg_files)
             if (displayName == ""):
-                conditionDirectoryName = "C" + str(i).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
+                conditionDirectoryName = "C" + str(i + args.offset).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
             else:
-                conditionDirectoryName = displayName + "_C" + str(i).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
+                conditionDirectoryName = displayName + "_C" + str(i + args.offset).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
             print("running:")
             print("  " + executable + " -f " + cfg_files_str + " -p GLOBAL-outputPrefix " + conditionDirectoryName + "/" + str(rep).zfill(padSizeReps) + "/ " + "GLOBAL-randomSeed " + str(rep) + " " + combinations[i][1:] + replacedConstantDefs)
             # make rep directory (this will also make the condition directory if it's not here already)
@@ -536,11 +538,11 @@ for i in range(len(combinations)):
             # go to the local directory (after each job is launched, we are in the work directory)
             os.chdir(absLocalDir)
             if (displayName == ""):
-                realDisplayName = "C" + str(i).zfill(padSizeCombinations) + "_" + str(rep).zfill(padSizeReps) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
-                conditionDirectoryName = "C" + str(i).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
+                realDisplayName = "C" + str(i + args.offset).zfill(padSizeCombinations) + "_" + str(rep).zfill(padSizeReps) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
+                conditionDirectoryName = "C" + str(i + args.offset).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
             else:
-                realDisplayName = displayName + "_C" + str(i).zfill(padSizeCombinations) + "_" + str(rep).zfill(padSizeReps) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
-                conditionDirectoryName = displayName + "_C" + str(i).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
+                realDisplayName = displayName + "_C" + str(i + args.offset).zfill(padSizeCombinations) + "_" + str(rep).zfill(padSizeReps) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
+                conditionDirectoryName = displayName + "_C" + str(i + args.offset).zfill(padSizeCombinations) + "__" + stripIllegalDirnameChars(conditions[i][1:-1])
                 
             timeNow = str(datetime.datetime.now().year) + '_' + str(datetime.datetime.now().month) + '_' + str(datetime.datetime.now().day) + \
                 '_' + str(datetime.datetime.now().hour) + '_' + str(
@@ -587,8 +589,8 @@ for i in range(len(combinations)):
             print("  " + realDisplayName + " :")
             print("  workDir = " + workDir)
             print("  sbatch " + slurmFileName)
-            if not args.runNo:
-                call(["sbatch", slurmFileName])  # run the job
+            #if not args.runNo:
+            #    call(["sbatch", slurmFileName])  # run the job
 
 if args.runNo:
     print("")

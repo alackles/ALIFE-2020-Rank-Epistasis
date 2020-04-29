@@ -5,7 +5,7 @@
 # REPS = [FIRST REP] [LAST REP]
 # if experiments are up to 3-digits, then start at 101. If up to 4-digits start at 1001, etc.
 # This convention solves sorting and zero-padding problems later.
-REPS = 101 150
+REPS = 501 550
 
 # Settings to override the config files, but will not be varied
 # Multiple CONSTANT definitions will be added together.
@@ -19,27 +19,26 @@ VAR = FIX WORLD_NK-readNKTable
 VAR = K WORLD_NK-k 
 VAR = ED WORLD_NK_OUTPUT-outputEditDistanceMetric 
 VAR = MUT GENOME_CIRCULAR-mutationIndelRate
-
-# Release vars from memory
-rm(example_filename)
-
-# Prepare the data frame to hold the scraped data
-data = data.frame(data = matrix(nrow = 0, ncol = length(column_names)))
-colnames(data) = column_names
-print('Column names to scrape: ')
-print(colnames(data))
-
+VAR = TRD WORLD_NK-treadmill
+VAR = VEL WORLD_NK-velocity
 
 # Alternatively to VAR/EXCEPT, conditions can achieve a similar effect and still respect EXCEPT declarations
 #CONDITIONS = TSK=1.0,3.0  RF1="some message here"  RF2=2,[1,2,3,4]
 #CONDITIONS = EAM=1,0  AE=0
-CONDITIONS = FIX=0,1 K=3,5,10 ED=0,1 MUT=0.1,0.01
+#CONDITIONS = FIX=0,1 K=3,5,10 ED=0,1 MUT=0.1,0.01
+#CONDITIONS = FIX=0,1 K=3,5,10 ED=0,1 MUT=0.001
+#CONDITIONS = FIX=0 K=3,5,10 ED=0 MUT=0.1,0.001 TRD=1 VEL=0.01,0.1
+#CONDITIONS = FIX=0,1 K=3,5,10 ED=0,1 MUT=0.1,0.01,0.001 TRD=0,1 VEL=0.01,0.1,0.05
+CONDITIONS = FIX=0,1 K=3,5,10 ED=1 MUT=0.1,0.01,0.001 TRD=1 VEL=0.01,0.1,0.05
 
 # EXCEPT = [SHORT NAME]=[condition],[SHORT NAME]=[condition],etc.
 # If all name/condition pairs are met for any EXCEPT, then that combination will not be run.
 #EXCEPT = EAM=0 AE=0
 EXCEPT = FIX=1 K=5
 EXCEPT = FIX=1 K=10
+EXCEPT = TRD=0 VEL=0.01
+EXCEPT = TRD=0 VEL=0.05
+EXCEPT = FIX=1 TRD=1
 
 # list of setting files (.cfg) which you want MABE to load with the -f option. files will be loaded in the order provided.
 SETTINGS = settings.cfg,settings_organism.cfg,settings_world.cfg
