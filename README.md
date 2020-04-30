@@ -14,7 +14,7 @@ In short, the metric exists in four steps:
 3. Rank all these mutatnts using the same methods from step 1
 4. Compute the edit distance between the two rankings. 
 
-For a thorough dive, we eoncourage you to read the class paper written on the topic here. 
+For a thorough dive, we eoncourage you to read the class paper written on the topic [here](./docs/cse_845_project_writeup.pdf). 
 
 Below is information supplemental to the paper:
 
