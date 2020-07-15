@@ -19,9 +19,9 @@
 #include <string>
 #include <algorithm>
 
-struct NKOrgData{
-    size_t rank;
-    size_t idx_original;
+struct RankEpistasisData{
+    size_t offset;
+    double rank;
     double score_original;
     double score_mutant;
 };
@@ -68,7 +68,7 @@ public:
     std::stringstream output_string_stream;
     std::vector<size_t> rank_vec_original;  
     std::vector<size_t> rank_vec_mutated;  
-    std::vector<NKOrgData> mutant_data_vec;  
+    std::vector<RankEpistasisData> mutant_data_vec;  
     // Mutant fitness variables
     bool output_mutant_fitness;
     std::string output_mutant_fitness_filename;    
@@ -86,6 +86,7 @@ public:
     void recordMutantFitness(std::map<std::string, std::shared_ptr<Group>> &groups);
 
     // evaluate functions
+    double evaluateData(const std::vector<uint8_t>& data);
     double evaluateBrain(std::shared_ptr<AbstractBrain>& brain);
     void evaluateSolo(std::shared_ptr<Organism> org, int analyze, int visualize, int debug);
    
